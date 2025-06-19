@@ -194,3 +194,40 @@ select option {
 .ev-positive { color: #44ff44; }
 .ev-negative { color: #ff4444; }
 
+.breakdown {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.breakdown h3 {
+    color: #ffd700;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.breakdown-item:last-child {
+    border-bottom: none;
+    font-weight: bold;
+    color: #ffd700;
+}
+
+canvas {
+    border-radius: 8px;
+}
+
+@media (max-width: 1200px) {
+    .container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        height: auto;
+    }
+}
