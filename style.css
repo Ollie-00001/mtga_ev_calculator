@@ -97,3 +97,42 @@ body {
     position: relative;
 }
 
+.winrate-slider {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(to right, #ff4444, #ffaa00, #44ff44);
+    outline: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+}
+
+.winrate-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #ffd700;
+    cursor: pointer;
+    border: 3px solid #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.winrate-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #ffd700;
+    cursor: pointer;
+    border: 3px solid #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.winrate-display {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #ffd700;
+    margin-top: 10px;
+}
