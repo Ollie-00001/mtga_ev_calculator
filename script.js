@@ -66,3 +66,22 @@ const eventData = {
                 maxLosses: 3
             }
         };
+
+
+// DOM elements
+const eventSelect = document.getElementById('event-select');
+const packValueInput = document.getElementById('pack-value');
+const gemGoldRatioInput = document.getElementById('gems-gold-ratio');
+const winrateSlider = document.getElementById('winrate-slider');
+const winrateDisplay = document.getElementById('winrate-display');
+const evValue = document.getElementById('ev-value');
+const eventDetails = document.getElementById('event-details');
+const entryCost = document.getElementById('entry-cost');
+const expectedGems = document.getElementById('expected-gems');
+const expectedPacks = document.getElementById('expected-packs');
+const packValueDisplay = document.getElementById('pack-value-display');
+const totalEv = document.getElementById('total-ev');
+
+// Chart setup
+const ctx = document.getElementById('ev-chart').getContext('2d');
+let chart;
