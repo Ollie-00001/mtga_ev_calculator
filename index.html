@@ -36,6 +36,8 @@
             <!-- Event Details (TO BE COMPLETED) -->
             <div class="settings-group">
                 <label>Event Details</label>
+                <div id="event-details">
+                </div>
             </div>
         </div>
 
@@ -45,7 +47,7 @@
                 <h1>MTGA EV Calculator</h1>
                 <p>Calculate the expected value of your MTGA events</p>
             </div>
-
+            
             <div class="chart-body">
                 <canvas id="ev-chart"></canvas>
             </div>
@@ -65,31 +67,33 @@
                 <label for="ev-lable">Expected Value</label>
                 <div class="ev-value" id="ev-value">+0</div>
             </div>
+
             <div class="breakdown">
-                
-            <h3>Breakdown</h3>
-            <div class="breakdown-item">
-                <span>Entry Cost:</span>
-                <span id="entry-cost">-1500</span>
-            </div>
-            <div class="breakdown-item">
-                <span>Expected Gems:</span>
-                <span id="expected-gems">0</span>
-            </div>
-            <div class="breakdown-item">
-                <span>Expected Packs:</span>
-                <span id="expected-packs">0</span>
-            </div>
-            <div class="breakdown-item">
-                <span>Pack Value:</span>
-                <span id="pack-value-display">0</span>
-            </div>
-            <div class="breakdown-item">
-                <span>Total EV:</span>
-                <span id="total-ev">0</span>
+                <h3>Breakdown</h3>
+                <div class="breakdown-item">
+                    <span>Entry Cost:</span>
+                    <span id="entry-cost">-1500</span>
+                </div>
+                <div class="breakdown-item">
+                    <span>Expected Gems:</span>
+                    <span id="expected-gems">0</span>
+                </div>
+                <div class="breakdown-item">
+                    <span>Expected Packs:</span>
+                    <span id="expected-packs">0</span>
+                </div>
+                <div class="breakdown-item">
+                    <span>Pack Value:</span>
+                    <span id="pack-value-display">0</span>
+                </div>
+                <div class="breakdown-item">
+                    <span>Total EV:</span>
+                    <span id="total-ev">0</span>
+                </div>
             </div>
         </div>
     </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
