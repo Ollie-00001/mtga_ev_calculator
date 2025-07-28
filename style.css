@@ -57,6 +57,13 @@ body {
     letter-spacing: 1px;
 }
 
+#event-details {
+    background: rgba(0,0,0,0.3); 
+    padding: 15px; 
+    border-radius: 8px; 
+    font-size: 14px;
+}
+
 select, input[type="number"] {
     background: rgba(0, 0, 0, 0.3);
     border: 2px solid rgba(255, 255, 255, 0.2);
