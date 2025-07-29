@@ -67,7 +67,7 @@ const eventData = {
                 maxLosses: 3
             },
             direct6wins: {
-                name: "Arena Direct (6 wins = Play Booster Box(x2))",
+                name: "Arena Direct (6 wins = Play Booster Box)",
                 cost: 6000,
                 currency: "gems",
                 rewards: {
@@ -100,6 +100,65 @@ const eventData = {
                 maxWins: 7,
                 maxLosses: 3,
                 format: "Best-of-One"
+            },
+            arenaOpenDay1Bo1: {
+                name: "Arena Open Day 1 (Bo1)",
+                cost: 5000,
+                currency: "gems",
+                rewards: {
+                    0: { gems: 0 },
+                    1: { gems: 0 },
+                    2: { gems: 0 },
+                    3: { gems: 0 },
+                    4: { gems: 0 },
+                    5: { gems: 1000 },
+                    6: { gems: 2500 },
+                    7: { gems: 5000, token: true }
+                },
+                maxWins: 7,
+                maxLosses: 3
+            },
+            arenaOpenDay1Bo3: {
+                name: "Arena Open Day 1 (Bo3)",
+                cost: 5000,
+                currency: "gems",
+                rewards: {
+                    0: { gems: 0 },
+                    1: { gems: 1500 },
+                    2: { gems: 3000 },
+                    3: { gems: 5000 },
+                    4: { gems: 6000, token: true }
+                },
+                maxWins: 4,
+                maxLosses: 1
+            },
+            arenaOpenDay2Draft1: {
+                name: "Arena Open Day 2 (Draft One)",
+                cost: 0,
+                currency: "invitation",
+                rewards: {
+                    0: { gems: 500 },
+                    1: { gems: 1500 },
+                    2: { gems: 2500 },
+                    3: { token: true },
+                    4: { token: true }
+                },
+                maxWins: 4,
+                maxLosses: 0
+            },
+            arenaOpenDay2Draft2: {
+                name: "Arena Open Day 2 Draft Two",
+                cost: 0,
+                currency: "invitation",
+                rewards: {
+                    0: { gems: 5000 },
+                    1: { gems: 15000 },
+                    2: { usd: 500 },
+                    3: { usd: 1000 },
+                    4: { usd: 2000 }
+                },
+                maxWins: 4,
+                maxLosses: 2
             }
         };
 
@@ -184,9 +243,16 @@ function calculateEV() {
     for (let wins = 0; wins <= selectedEvent.maxWins; wins++) {
         const prob = probabilities[wins] || 0;
         const reward = selectedEvent.rewards[wins];
-        
-        expectedGemsReturn += prob * reward.gems;
-        expectedPacksReturn += prob * reward.packs;
+
+        if (!reward) continue;
+
+        if (typeof reward.gems === 'number') {
+            expectedGemsReturn += prob * reward.gems;
+        }
+
+        if (typeof reward.packs === 'number') {
+            expectedPacksReturn += prob * reward.packs;
+        }
     }
     
     const packValueTotal = expectedPacksReturn * packValue;
@@ -203,6 +269,15 @@ function calculateEV() {
     };
 }
 
+function formatReward(reward) {
+    const parts = [];
+    if (reward.gems) parts.push(`+${reward.gems} gems`);
+    if (reward.usd) parts.push(`$${reward.usd}`);
+    if (reward.token) parts.push('🎟️ Token for Day 2');
+    if (parts.length === 0) return 'No rewards';
+    return parts.join(', ');
+}
+
 // Update display
 function updateDisplay() {
     const result = calculateEV();
@@ -216,21 +291,37 @@ function updateDisplay() {
     evValue.textContent = evFormatted;
     evValue.className = 'ev-value ' + (result.ev >= 0 ? 'ev-positive' : 'ev-negative');
     
-    // Update breakdown
     entryCost.textContent = '-' + selectedEvent.cost;
+
+    if (eventSelect.value.startsWith('arenaOpen')) {
+        let rewardsText = '';
+        for (let wins = 0; wins <= selectedEvent.maxWins; wins++) {
+            rewardsText += `${wins} wins: ${formatReward(selectedEvent.rewards[wins])}<br>`;
+        }
+        eventDetails.innerHTML = `
+            <strong>${selectedEvent.name}</strong><br>
+            Cost: ${selectedEvent.cost} ${selectedEvent.currency}<br>
+            Format: Best of ${selectedEvent.maxLosses === 1 ? '3' : '1'}<br>
+            Max Wins: ${selectedEvent.maxWins}<br>
+            Max Losses: ${selectedEvent.maxLosses}<br><br>
+            Rewards:<br>
+            ${rewardsText}
+        `;
+    } else {
+        eventDetails.innerHTML = `
+            <strong>${selectedEvent.name}</strong><br>
+            Cost: ${selectedEvent.cost} ${selectedEvent.currency}<br>
+            Format: Best of ${selectedEvent.maxLosses === 1 ? '3' : '1'}<br>
+            Max Wins: ${selectedEvent.maxWins}<br>
+            Max Losses: ${selectedEvent.maxLosses}
+        `;
+    }
+
+    // Обновляем остальные поля
     expectedGems.textContent = '+' + Math.round(result.expectedGems);
     expectedPacks.textContent = result.expectedPacks.toFixed(2);
     packValueDisplay.textContent = '+' + Math.round(result.packValueTotal);
     totalEv.textContent = evFormatted;
-    
-    // Update event details
-    eventDetails.innerHTML = `
-        <strong>${selectedEvent.name}</strong><br>
-        Cost: ${selectedEvent.cost} ${selectedEvent.currency}<br>
-        Format: Best of ${selectedEvent.maxLosses === 1 ? '3' : '1'}<br>
-        Max Wins: ${selectedEvent.maxWins}<br>
-        Max Losses: ${selectedEvent.maxLosses}
-    `;
     
     updateChart(result);
 }
@@ -244,8 +335,10 @@ function updateChart(result) {
     
     for (let wins = 0; wins <= selectedEvent.maxWins; wins++) {
         labels.push(`${wins} Wins`);
-        const reward = selectedEvent.rewards[wins];
-        const rewardValue = reward.gems + (reward.packs * parseFloat(packValueInput.value));
+        const reward = selectedEvent.rewards[wins] || {};
+        const gems = typeof reward.gems === 'number' ? reward.gems : 0;
+        const packs = typeof reward.packs === 'number' ? reward.packs : 0;
+        const rewardValue = gems + (packs * parseFloat(packValueInput.value));
         const outcomeEV = rewardValue - selectedEvent.cost;
         evData.push(outcomeEV);
         probData.push((result.probabilities[wins] || 0) * 100);
