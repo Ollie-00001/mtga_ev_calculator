@@ -14,10 +14,10 @@
              <div class="settings-group">
                 <label for="event-select">Event</label>
                 <select id="event-select">
-                    <option value="1">Premier Draft (1500 gems)</option>
-                    <option value="2">Traditional Draft (1500 gems)</option>
-                    <option value="3">Quick Draft (750 gems)</option>
-                    <option value="4">Sealed (2000 gems)</option>
+                    <option value="premier">Premier Draft (1500 gems)</option>
+                    <option value="traditional">Traditional Draft (1500 gems)</option>
+                    <option value="quick">Quick Draft (750 gems)</option>
+                    <option value="sealed">Sealed (2000 gems)</option>
                 </select>
             </div>
 
@@ -35,7 +35,7 @@
 
             <!-- Event Details (TO BE COMPLETED) -->
             <div class="settings-group">
-                <label>Event Details</label>
+                <div>Event Details</div>
                 <div id="event-details">
                 </div>
             </div>
@@ -53,7 +53,7 @@
             </div>
 
             <div class="slider-container">
-                <label class="slider-label">Win Rate</label>
+                <label for="winrate-slider" class="slider-label">Win Rate</label>
                 <div class="slider-wrapper">
                     <input type="range" id="winrate-slider" class="winrate-slider" min="0" max="100" value="50" step="0.01">
                 </div>
@@ -64,7 +64,7 @@
         <!-- Results Panel -->
         <div class="panel results-panel">
             <div class="ev-display">
-                <label for="ev-label">Expected Value</label>
+                <div>Expected Value</div>
                 <div class="ev-value" id="ev-value">+0</div>
             </div>
 
