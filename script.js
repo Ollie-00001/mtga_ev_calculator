@@ -203,3 +203,144 @@ function calculateEV() {
     };
 }
 
+// Update display
+function updateDisplay() {
+    const result = calculateEV();
+    const selectedEvent = eventData[eventSelect.value];
+    
+    // Update winrate display
+    winrateDisplay.textContent = parseFloat(winrateSlider.value).toFixed(2) + '%';
+    
+    // Update EV display
+    const evFormatted = (result.ev >= 0 ? '+' : '') + Math.round(result.ev);
+    evValue.textContent = evFormatted;
+    evValue.className = 'ev-value ' + (result.ev >= 0 ? 'ev-positive' : 'ev-negative');
+    
+    // Update breakdown
+    entryCost.textContent = '-' + selectedEvent.cost;
+    expectedGems.textContent = '+' + Math.round(result.expectedGems);
+    expectedPacks.textContent = result.expectedPacks.toFixed(2);
+    packValueDisplay.textContent = '+' + Math.round(result.packValueTotal);
+    totalEv.textContent = evFormatted;
+    
+    // Update event details
+    eventDetails.innerHTML = `
+        <strong>${selectedEvent.name}</strong><br>
+        Cost: ${selectedEvent.cost} ${selectedEvent.currency}<br>
+        Format: Best of ${selectedEvent.maxLosses === 1 ? '3' : '1'}<br>
+        Max Wins: ${selectedEvent.maxWins}<br>
+        Max Losses: ${selectedEvent.maxLosses}
+    `;
+    
+    updateChart(result);
+}
+
+// Update chart
+function updateChart(result) {
+    const selectedEvent = eventData[eventSelect.value];
+    const labels = [];
+    const evData = [];
+    const probData = [];
+    
+    for (let wins = 0; wins <= selectedEvent.maxWins; wins++) {
+        labels.push(`${wins} Wins`);
+        const reward = selectedEvent.rewards[wins];
+        const rewardValue = reward.gems + (reward.packs * parseFloat(packValueInput.value));
+        const outcomeEV = rewardValue - selectedEvent.cost;
+        evData.push(outcomeEV);
+        probData.push((result.probabilities[wins] || 0) * 100);
+    }
+    
+    if (chart) {
+        chart.destroy();
+    }
+    
+    chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'EV per Outcome',
+                data: evData,
+                backgroundColor: evData.map(val => 
+                    val >= 0 ? 'rgba(68, 255, 68, 0.7)' : 'rgba(255, 68, 68, 0.7)'
+                ),
+                borderColor: evData.map(val => 
+                    val >= 0 ? 'rgba(68, 255, 68, 1)' : 'rgba(255, 68, 68, 1)'
+                ),
+                borderWidth: 2,
+                yAxisID: 'y'
+            }, {
+                label: 'Probability (%)',
+                data: probData,
+                type: 'line',
+                backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                borderColor: 'rgba(255, 215, 0, 1)',
+                borderWidth: 3,
+                fill: false,
+                yAxisID: 'y1',
+                pointBackgroundColor: 'rgba(255, 215, 0, 1)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#ffffff',
+                        font: {
+                            size: 14
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: '#ffffff'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    ticks: {
+                        color: '#ffffff'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Expected Value (Gems)',
+                        color: '#ffffff'
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    ticks: {
+                        color: '#ffd700'
+                    },
+                    grid: {
+                        drawOnChartArea: false,
+                    },
+                    title: {
+                        display: true,
+                        text: 'Probability (%)',
+                        color: '#ffd700'
+                    }
+                }
+            }
+        }
+    });
+}
+
