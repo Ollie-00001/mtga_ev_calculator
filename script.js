@@ -1,5 +1,6 @@
 // Event rewards and costs for MTGA events
 // This data is used to calculate the expected value (EV) of participating in different MTGA
+window.onload = function() {
 const eventData = {
             premier: {
                 name: "Premier Draft",
@@ -64,14 +65,48 @@ const eventData = {
                 },
                 maxWins: 7,
                 maxLosses: 3
+            },
+            direct6wins: {
+                name: "Arena Direct (6 wins = Play Booster Box(x2))",
+                cost: 6000,
+                currency: "gems",
+                rewards: {
+                    0: { gems: 0, packs: 0 },
+                    1: { gems: 0, packs: 0 },
+                    2: { gems: 0, packs: 0 },
+                    3: { gems: 3600, packs: 8 },
+                    4: { gems: 7200, packs: 16 },
+                    5: { gems: 10800, packs: 24 },
+                    6: { gems: 40000, packs: 32 },
+                },
+                maxWins: 6,
+                maxLosses: 2,
+                format: "Best-of-One"
+            },
+            direct7wins: {
+                name: "Arena Direct (7 wins = Collector Box)",
+                cost: 6000,
+                currency: "gems",
+                rewards: {
+                    0: { gems: 0, packs: 0 },
+                    1: { gems: 0, packs: 0 },
+                    2: { gems: 0, packs: 0 },
+                    3: { gems: 3600, packs: 8 },
+                    4: { gems: 7200, packs: 16 },
+                    5: { gems: 10800, packs: 24 },
+                    6: { gems: 14400, packs: 32 },
+                    7: { gems: 80000, packs: 0 }
+                },
+                maxWins: 7,
+                maxLosses: 3,
+                format: "Best-of-One"
             }
         };
-
 
 // DOM elements
 const eventSelect = document.getElementById('event-select');
 const packValueInput = document.getElementById('pack-value');
-const gemGoldRatioInput = document.getElementById('gems-gold-ratio');
+const gemsGoldRatioInput = document.getElementById('gems-gold-ratio');
 const winrateSlider = document.getElementById('winrate-slider');
 const winrateDisplay = document.getElementById('winrate-display');
 const evValue = document.getElementById('ev-value');
