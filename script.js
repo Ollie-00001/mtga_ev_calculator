@@ -120,3 +120,53 @@ const totalEv = document.getElementById('total-ev');
 // Chart setup
 const ctx = document.getElementById('ev-chart').getContext('2d');
 let chart;
+
+// Calculate binomial probability
+function binomialProbability(n, k, p) {
+    function factorial(num) {
+        if (num <= 1) return 1;
+        return num * factorial(num - 1);
+    }
+    
+    function combination(n, k) {
+        return factorial(n) / (factorial(k) * factorial(n - k));
+    }
+    
+    return combination(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k);
+}
+
+// Calculate match outcome probabilities
+function calculateOutcomeProbabilities(winRate, event) {
+    const p = winRate / 100;
+    const maxWins = event.maxWins;
+    const maxLosses = event.maxLosses;
+
+    const dp = [];
+    for (let w = 0; w <= maxWins; w++) {
+        dp[w] = new Array(maxLosses + 1).fill(0);
+    }
+    dp[0][0] = 1;
+
+    // probability for finishing with exactly W wins
+    const probabilities = new Array(maxWins + 1).fill(0);
+
+    for (let w = 0; w <= maxWins; w++) {
+        for (let l = 0; l <= maxLosses; l++) {
+            if (dp[w][l] === 0) continue;
+            
+            if (w === maxWins || l === maxLosses) {
+                probabilities[w] += dp[w][l];
+                continue;
+            }
+            
+            dp[w + 1][l] += dp[w][l] * p;
+            dp[w][l + 1] += dp[w][l] * (1 - p);
+        }
+    }
+
+    return probabilities.reduce((acc, val, idx) => {
+        acc[idx] = val;
+        return acc;
+    }, {});
+}
+
