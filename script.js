@@ -344,3 +344,13 @@ function updateChart(result) {
     });
 }
 
+// Initialize
+updateDisplay();
+
+// Event listeners
+eventSelect.addEventListener('change', updateDisplay);
+packValueInput.addEventListener('input', updateDisplay);
+gemsGoldRatioInput.addEventListener('input', updateDisplay);
+winrateSlider.addEventListener('input', updateDisplay);
+
+};
