@@ -170,3 +170,36 @@ function calculateOutcomeProbabilities(winRate, event) {
     }, {});
 }
 
+// Calculate expected value
+function calculateEV() {
+    const selectedEvent = eventData[eventSelect.value];
+    const winRate = parseFloat(winrateSlider.value);
+    const packValue = parseFloat(packValueInput.value);
+    
+    const probabilities = calculateOutcomeProbabilities(winRate, selectedEvent);
+    
+    let expectedGemsReturn = 0;
+    let expectedPacksReturn = 0;
+    
+    for (let wins = 0; wins <= selectedEvent.maxWins; wins++) {
+        const prob = probabilities[wins] || 0;
+        const reward = selectedEvent.rewards[wins];
+        
+        expectedGemsReturn += prob * reward.gems;
+        expectedPacksReturn += prob * reward.packs;
+    }
+    
+    const packValueTotal = expectedPacksReturn * packValue;
+    const totalReturn = expectedGemsReturn + packValueTotal;
+    const ev = totalReturn - selectedEvent.cost;
+    
+    return {
+        ev: ev,
+        expectedGems: expectedGemsReturn,
+        expectedPacks: expectedPacksReturn,
+        packValueTotal: packValueTotal,
+        totalReturn: totalReturn,
+        probabilities: probabilities
+    };
+}
+
