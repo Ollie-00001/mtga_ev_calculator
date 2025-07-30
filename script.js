@@ -133,7 +133,7 @@ const eventData = {
                 maxLosses: 1
             },
             arenaOpenDay2Draft1: {
-                name: "Arena Open Day 2 (Draft One)",
+                name: "Arena Open Day 2 Draft One",
                 cost: 0,
                 currency: "invitation",
                 rewards: {
@@ -144,7 +144,7 @@ const eventData = {
                     4: { token: true }
                 },
                 maxWins: 4,
-                maxLosses: 0
+                maxLosses: 4
             },
             arenaOpenDay2Draft2: {
                 name: "Arena Open Day 2 Draft Two",
