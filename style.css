@@ -258,3 +258,12 @@ canvas {
         height: auto;
     }
 }
+
+footer {
+    color: #ffffff;
+    text-align: center;
+    padding: 20px;
+    padding-top: 35px;
+    position: relative;
+    width: 100%;
+}
