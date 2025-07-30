@@ -66,6 +66,38 @@ const eventData = {
                 maxWins: 7,
                 maxLosses: 3
             },
+            standardBo1: {
+                name: "Standard Event (Bo1)",
+                cost: 375,
+                currency: "gems",
+                rewards: {
+                    0: { gems: 25, packs: 0 },
+                    1: { gems: 50, packs: 0 },
+                    2: { gems: 75, packs: 1 },
+                    3: { gems: 200, packs: 1 },
+                    4: { gems: 300, packs: 1 },
+                    5: { gems: 400, packs: 2 },
+                    6: { gems: 450, packs: 2 },
+                    7: { gems: 500, packs: 3, pip: 1 }
+                },
+                maxWins: 7,
+                maxLosses: 3,
+            },
+            standardBo3: {
+                name: "Standard Event (Bo3)",
+                cost: 750,
+                currency: "gems",
+                rewards: {
+                    0: { gems: 50, packs: 1 },
+                    1: { gems: 100, packs: 1 },
+                    2: { gems: 150, packs: 2 },
+                    3: { gems: 600, packs: 2 },
+                    4: { gems: 800, packs: 2},
+                    5: { gems: 1000, packs: 3, pip: 4 },
+                },
+                maxWins: 5,
+                maxLosses: 5,
+            },
             direct6wins: {
                 name: "Arena Direct (6 wins = Play Booster Box)",
                 cost: 6000,
@@ -165,7 +197,7 @@ const eventData = {
 // DOM elements
 const eventSelect = document.getElementById('event-select');
 const packValueInput = document.getElementById('pack-value');
-const gemsGoldRatioInput = document.getElementById('gems-gold-ratio');
+const pipValueInput = document.getElementById('pip-value');
 const winrateSlider = document.getElementById('winrate-slider');
 const winrateDisplay = document.getElementById('winrate-display');
 const evValue = document.getElementById('ev-value');
@@ -234,12 +266,13 @@ function calculateEV() {
     const selectedEvent = eventData[eventSelect.value];
     const winRate = parseFloat(winrateSlider.value);
     const packValue = parseFloat(packValueInput.value);
-    
+    const pipValue = parseFloat(pipValueInput.value) || 0;
+
     const probabilities = calculateOutcomeProbabilities(winRate, selectedEvent);
-    
+
     let expectedGemsReturn = 0;
     let expectedPacksReturn = 0;
-    
+
     for (let wins = 0; wins <= selectedEvent.maxWins; wins++) {
         const prob = probabilities[wins] || 0;
         const reward = selectedEvent.rewards[wins];
@@ -253,12 +286,16 @@ function calculateEV() {
         if (typeof reward.packs === 'number') {
             expectedPacksReturn += prob * reward.packs;
         }
+
+        if (typeof reward.pip === 'number') {
+            expectedGemsReturn += prob * reward.pip * pipValue;
+        }
     }
-    
+
     const packValueTotal = expectedPacksReturn * packValue;
     const totalReturn = expectedGemsReturn + packValueTotal;
     const ev = totalReturn - selectedEvent.cost;
-    
+
     return {
         ev: ev,
         expectedGems: expectedGemsReturn,
@@ -443,7 +480,7 @@ updateDisplay();
 // Event listeners
 eventSelect.addEventListener('change', updateDisplay);
 packValueInput.addEventListener('input', updateDisplay);
-gemsGoldRatioInput.addEventListener('input', updateDisplay);
 winrateSlider.addEventListener('input', updateDisplay);
+pipValueInput.addEventListener('input', updateDisplay);
 
 };
