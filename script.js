@@ -199,6 +199,14 @@ const eventData = {
                 maxWins: 15,
                 maxLosses: 3, // Можно скорректировать, если нужно учитывать поражения на каждом этапе
                 rewards: {}, // Заполним ниже
+            },
+            arenaOpenAllDaysBo3: {
+                name: "Arena Open (All Days, Bo3)",
+                cost: 5000,
+                currency: "gems",
+                maxWins: 12, // 4 (Day1 Bo3) + 4 (Draft1) + 4 (Draft2)
+                maxLosses: 1, // Для первого дня Bo3
+                rewards: {}, // Заполним ниже
             }
         };
 
@@ -240,6 +248,35 @@ for (let totalWins = 0; totalWins <= 15; totalWins++) {
         }
     }
     eventData.arenaOpenAllDaysBo1.rewards[totalWins] = reward;
+}
+
+for (let totalWins = 0; totalWins <= 12; totalWins++) {
+    let reward = { gems: 0 };
+
+    if (totalWins < 4) {
+        // Не прошёл первый день — награды Day1 Bo3
+        const day1Reward = eventData.arenaOpenDay1Bo3.rewards[totalWins] || { gems: 0 };
+        reward = { gems: day1Reward.gems || 0 };
+    } else if (totalWins === 4) {
+        // Прошёл первый день, получил токен (6000 gems + token)
+        reward = { gems: 6000 };
+    } else if (totalWins >= 5 && totalWins <= 8) {
+        // Draft 1 (прошёл первый день)
+        const draft1Wins = totalWins - 4;
+        const draft1Reward = eventData.arenaOpenDay2Draft1.rewards[draft1Wins] || { gems: 0 };
+        reward = { gems: 6000 + (draft1Reward.gems || 0) };
+    } else if (totalWins >= 9 && totalWins <= 12) {
+        // Draft 2 (прошёл первый день и Draft 1)
+        const draft2Wins = totalWins - 8;
+        const draft2Reward = eventData.arenaOpenDay2Draft2.rewards[draft2Wins] || { gems: 0, usd: 0 };
+        reward = {
+            gems: 6000 + (draft2Reward.gems || 0),
+        };
+        if (draft2Reward.usd) {
+            reward.usd = draft2Reward.usd;
+        }
+    }
+    eventData.arenaOpenAllDaysBo3.rewards[totalWins] = reward;
 }
 
 // DOM elements
@@ -334,6 +371,27 @@ function calculateCombinedProbabilities(winRate) {
     return probabilities;
 }
 
+function calculateCombinedProbabilitiesBo3(winRate) {
+    // Первый день: 4 победы из 5 (Bo3)
+    const day1Probs = calculateOutcomeProbabilities(winRate, { maxWins: 4, maxLosses: 1 });
+    // Второй день: 4 победы из 7 (Draft 1)
+    const draft1Probs = calculateOutcomeProbabilities(winRate, { maxWins: 4, maxLosses: 3 });
+    // Третий день: 4 победы из 6 (Draft 2)
+    const draft2Probs = calculateOutcomeProbabilities(winRate, { maxWins: 4, maxLosses: 2 });
+
+    const probabilities = {};
+    for (let w1 = 0; w1 <= 4; w1++) {
+        for (let w2 = 0; w2 <= 4; w2++) {
+            for (let w3 = 0; w3 <= 4; w3++) {
+                const totalWins = w1 + w2 + w3;
+                const prob = (day1Probs[w1] || 0) * (w1 === 4 ? (draft1Probs[w2] || 0) : (w2 === 0 ? 1 : 0)) * (w2 === 4 ? (draft2Probs[w3] || 0) : (w3 === 0 ? 1 : 0));
+                probabilities[totalWins] = (probabilities[totalWins] || 0) + prob;
+            }
+        }
+    }
+    return probabilities;
+}
+
 // Calculate expected value
 function calculateEV() {
     const selectedEvent = eventData[eventSelect.value];
@@ -343,7 +401,14 @@ function calculateEV() {
     const rareCount = parseFloat(rareCountInput.value) || 0;
     const rareValue = parseFloat(rareValueInput.value) || 0;
 
-    const probabilities = calculateOutcomeProbabilities(winRate, selectedEvent);
+    let probabilities;
+    if (eventSelect.value === 'arenaOpenAllDaysBo1') {
+        probabilities = calculateCombinedProbabilities(winRate);
+    } else if (eventSelect.value === 'arenaOpenAllDaysBo3') {
+        probabilities = calculateCombinedProbabilitiesBo3(winRate);
+    } else {
+        probabilities = calculateOutcomeProbabilities(winRate, selectedEvent);
+    }
 
     let expectedGemsReturn = 0;
     let expectedPacksReturn = 0;
@@ -386,7 +451,8 @@ function calculateEV() {
 function formatReward(reward, eventKey, wins) {
     if (
         (eventKey === 'arenaOpenDay2Draft2' && [2, 3, 4].includes(wins) && reward.usd) ||
-        (eventKey === 'arenaOpenAllDaysBo1' && [13, 14, 15].includes(wins) && reward.usd)
+        (eventKey === 'arenaOpenAllDaysBo1' && [13, 14, 15].includes(wins) && reward.usd) ||
+        (eventKey === 'arenaOpenAllDaysBo3' && [10, 11, 12].includes(wins) && reward.usd)
     ) {
         return `$${reward.usd}`;
     }
