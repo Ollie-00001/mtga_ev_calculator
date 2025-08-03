@@ -185,9 +185,9 @@ const eventData = {
                 rewards: {
                     0: { gems: 5000 },
                     1: { gems: 15000 },
-                    2: { usd: 500 },
-                    3: { usd: 1000 },
-                    4: { usd: 2000 }
+                    2: { usd: 500, gems: 100000 },
+                    3: { usd: 1000,gems: 200000 },
+                    4: { usd: 2000, gems: 400000 }
                 },
                 maxWins: 4,
                 maxLosses: 2
@@ -313,10 +313,13 @@ function calculateEV() {
     };
 }
 
-function formatReward(reward) {
+function formatReward(reward, eventKey, wins) {
+    if (eventKey === 'arenaOpenDay2Draft2' && [2, 3, 4].includes(wins) && reward.usd) {
+        return `$${reward.usd}`;
+    }
     const parts = [];
-    if (reward.gems) parts.push(`+${reward.gems} gems`);
     if (reward.usd) parts.push(`$${reward.usd}`);
+    if (reward.gems) parts.push(`+${reward.gems} gems`);
     if (reward.token) parts.push('🎟️ Token for Day 2');
     if (parts.length === 0) return 'No rewards';
     return parts.join(', ');
@@ -340,7 +343,7 @@ function updateDisplay() {
     if (eventSelect.value.startsWith('arenaOpen')) {
         let rewardsText = '';
         for (let wins = 0; wins <= selectedEvent.maxWins; wins++) {
-            rewardsText += `${wins} wins: ${formatReward(selectedEvent.rewards[wins])}<br>`;
+            rewardsText += `${wins} wins: ${formatReward(selectedEvent.rewards[wins], eventSelect.value, wins)}<br>`;
         }
         eventDetails.innerHTML = `
             <strong>${selectedEvent.name}</strong><br>
