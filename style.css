@@ -57,6 +57,27 @@ body {
     letter-spacing: 1px;
 }
 
+.rares-row {
+    flex-direction: row;
+    gap: 8px;
+    align-items: flex-end;
+}
+
+.rares-row > div {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.rares-row input[type="number"] {
+    width: 140px;
+    min-width: 0;
+    padding: 12px;
+    font-size: 16px;
+    box-sizing: border-box;
+    display: block;
+    margin-top: 10px;
+}
+
 #event-details {
     background: rgba(0,0,0,0.3); 
     padding: 15px; 
