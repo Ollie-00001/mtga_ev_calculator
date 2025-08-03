@@ -198,6 +198,8 @@ const eventData = {
 const eventSelect = document.getElementById('event-select');
 const packValueInput = document.getElementById('pack-value');
 const pipValueInput = document.getElementById('pip-value');
+const rareCountInput = document.getElementById('rare-count');
+const rareValueInput = document.getElementById('rare-value');
 const winrateSlider = document.getElementById('winrate-slider');
 const winrateDisplay = document.getElementById('winrate-display');
 const evValue = document.getElementById('ev-value');
@@ -206,6 +208,7 @@ const entryCost = document.getElementById('entry-cost');
 const expectedGems = document.getElementById('expected-gems');
 const expectedPacks = document.getElementById('expected-packs');
 const packValueDisplay = document.getElementById('pack-value-display');
+const rareValueDisplay = document.getElementById('rare-value-display');
 const totalEv = document.getElementById('total-ev');
 
 // Chart setup
@@ -267,6 +270,8 @@ function calculateEV() {
     const winRate = parseFloat(winrateSlider.value);
     const packValue = parseFloat(packValueInput.value);
     const pipValue = parseFloat(pipValueInput.value) || 0;
+    const rareCount = parseFloat(rareCountInput.value) || 0;
+    const rareValue = parseFloat(rareValueInput.value) || 0;
 
     const probabilities = calculateOutcomeProbabilities(winRate, selectedEvent);
 
@@ -293,7 +298,8 @@ function calculateEV() {
     }
 
     const packValueTotal = expectedPacksReturn * packValue;
-    const totalReturn = expectedGemsReturn + packValueTotal;
+    const rareValueTotal = rareCount * rareValue;
+    const totalReturn = expectedGemsReturn + packValueTotal + rareValueTotal;
     const ev = totalReturn - selectedEvent.cost;
 
     return {
@@ -301,6 +307,7 @@ function calculateEV() {
         expectedGems: expectedGemsReturn,
         expectedPacks: expectedPacksReturn,
         packValueTotal: packValueTotal,
+        rareValueTotal: rareValueTotal,
         totalReturn: totalReturn,
         probabilities: probabilities
     };
@@ -358,7 +365,8 @@ function updateDisplay() {
     expectedGems.textContent = '+' + Math.round(result.expectedGems);
     expectedPacks.textContent = result.expectedPacks.toFixed(2);
     packValueDisplay.textContent = '+' + Math.round(result.packValueTotal);
-    totalEv.textContent = evFormatted;
+    rareValueDisplay.textContent = '+' + Math.round(result.rareValueTotal);
+    totalEv.textContent = (result.ev >= 0 ? '+' : '') + Math.round(result.ev);
     
     updateChart(result);
 }
@@ -478,9 +486,18 @@ function updateChart(result) {
 updateDisplay();
 
 // Event listeners
-eventSelect.addEventListener('change', updateDisplay);
+eventSelect.addEventListener('change', function() {
+    if (eventSelect.value === 'sealed') {
+        rareCountInput.value = 6;
+    } else {
+        rareCountInput.value = 3;
+    }
+    updateDisplay();
+});
 packValueInput.addEventListener('input', updateDisplay);
 winrateSlider.addEventListener('input', updateDisplay);
 pipValueInput.addEventListener('input', updateDisplay);
+rareCountInput.addEventListener('input', updateDisplay);
+rareValueInput.addEventListener('input', updateDisplay);
 
 };
