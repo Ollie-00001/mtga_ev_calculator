@@ -296,6 +296,7 @@ const pipValueInput = document.getElementById('pip-value');
 const rareCountInput = document.getElementById('rare-count');
 const rareValueInput = document.getElementById('rare-value');
 const winrateSlider = document.getElementById('winrate-slider');
+const winrateInput = document.getElementById('winrate-input');
 const winrateDisplay = document.getElementById('winrate-display');
 const evValue = document.getElementById('ev-value');
 const eventDetails = document.getElementById('event-details');
@@ -306,6 +307,52 @@ const packValueDisplay = document.getElementById('pack-value-display');
 const pipValueDisplay = document.getElementById('pip-value-display');
 const rareValueDisplay = document.getElementById('rare-value-display');
 const totalEv = document.getElementById('total-ev');
+
+winrateSlider.addEventListener('input', function() {
+    winrateInput.value = parseFloat(winrateSlider.value).toFixed(2);
+    winrateDisplay.textContent = winrateInput.value + '%';
+    updateDisplay();
+});
+
+winrateInput.addEventListener('input', function() {
+    let val = winrateInput.value;
+    if (val === '') {
+        winrateDisplay.textContent = '0.00%';
+        return;
+    }
+    val = parseFloat(val);
+    if (isNaN(val)) val = 0;
+    if (val < 0) val = 0;
+    if (val > 100) val = 100;
+    winrateSlider.value = val;
+    winrateDisplay.textContent = val.toFixed(2) + '%';
+});
+
+winrateInput.addEventListener('change', function() {
+    let val = parseFloat(winrateInput.value);
+    if (isNaN(val)) val = 0;
+    if (val < 0) val = 0;
+    if (val > 100) val = 100;
+    winrateInput.value = val.toFixed(2);
+    winrateSlider.value = val;
+    winrateDisplay.textContent = val.toFixed(2) + '%';
+    updateDisplay();
+});
+
+winrateInput.addEventListener('blur', function() {
+    let val = parseFloat(winrateInput.value);
+    if (isNaN(val)) val = 0;
+    if (val < 0) val = 0;
+    if (val > 100) val = 100;
+    winrateInput.value = val.toFixed(2);
+    winrateSlider.value = val;
+    winrateDisplay.textContent = val.toFixed(2) + '%';
+    updateDisplay();
+});
+
+winrateInput.addEventListener('focus', function() {
+    winrateInput.select();
+});
 
 // Chart setup
 const ctx = document.getElementById('ev-chart').getContext('2d');
@@ -511,6 +558,7 @@ function updateDisplay() {
     
     // Update winrate display
     winrateDisplay.textContent = parseFloat(winrateSlider.value).toFixed(2) + '%';
+    winrateInput.value = parseFloat(winrateSlider.value).toFixed(2);
     
     // Update EV display
     const evFormatted = (result.ev >= 0 ? '+' : '') + Math.round(result.ev);
