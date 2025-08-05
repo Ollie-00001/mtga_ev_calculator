@@ -37,13 +37,13 @@ const eventData = {
                 cost: 750,
                 currency: "gems",
                 rewards: {
-                    0: { gems: 50, packs: 1.2 },
-                    1: { gems: 100, packs: 1.22 },
-                    2: { gems: 200, packs: 1.24 },
-                    3: { gems: 300, packs: 1.26 },
-                    4: { gems: 450, packs: 1.3 },
-                    5: { gems: 650, packs: 1.35 },
-                    6: { gems: 850, packs: 1.4 },
+                    0: { gems: 50, packs: 1 },
+                    1: { gems: 100, packs: 1 },
+                    2: { gems: 200, packs: 1 },
+                    3: { gems: 300, packs: 1 },
+                    4: { gems: 450, packs: 1 },
+                    5: { gems: 650, packs: 1 },
+                    6: { gems: 850, packs: 1 },
                     7: { gems: 950, packs: 2 }
                 },
                 maxWins: 7,
@@ -109,7 +109,7 @@ const eventData = {
                     3: { gems: 3600, packs: 8 },
                     4: { gems: 7200, packs: 16 },
                     5: { gems: 10800, packs: 24 },
-                    6: { gems: 40000, packs: 32 },
+                    6: { gems: 40000, packs: 0 },
                 },
                 maxWins: 6,
                 maxLosses: 2,
@@ -467,7 +467,13 @@ function formatReward(reward, eventKey, wins) {
     }
     const parts = [];
     if (reward.usd) parts.push(`$${reward.usd}`);
-    if (reward.gems) parts.push(`+${reward.gems} gems`);
+    if (typeof reward.gems === 'number' && reward.gems > 0) parts.push(`${reward.gems} gems`);
+    if (typeof reward.packs === 'number' && reward.packs > 0) {
+        parts.push(`${reward.packs} ${reward.packs === 1 ? 'pack' : 'packs'}`);
+    }
+    if (typeof reward.pip === 'number' && reward.pip > 0) {
+        parts.push(`${reward.pip} ${reward.pip === 1 ? 'PIP' : 'PIPs'}`);
+    }
     if (reward.token) parts.push('🎟️ Token for Day 2');
     if (parts.length === 0) return 'No rewards';
     return parts.join(', ');
@@ -488,29 +494,19 @@ function updateDisplay() {
     
     entryCost.textContent = '-' + selectedEvent.cost;
 
-    if (eventSelect.value.startsWith('arenaOpen')) {
-        let rewardsText = '';
-        for (let wins = 0; wins <= selectedEvent.maxWins; wins++) {
-            rewardsText += `${wins} wins: ${formatReward(selectedEvent.rewards[wins], eventSelect.value, wins)}<br>`;
-        }
-        eventDetails.innerHTML = `
-            <strong>${selectedEvent.name}</strong><br>
-            Cost: ${selectedEvent.cost} ${selectedEvent.currency}<br>
-            Format: Best of ${selectedEvent.maxLosses === 1 ? '3' : '1'}<br>
-            Max Wins: ${selectedEvent.maxWins}<br>
-            Max Losses: ${selectedEvent.maxLosses}<br><br>
-            Rewards:<br>
-            ${rewardsText}
-        `;
-    } else {
-        eventDetails.innerHTML = `
-            <strong>${selectedEvent.name}</strong><br>
-            Cost: ${selectedEvent.cost} ${selectedEvent.currency}<br>
-            Format: Best of ${selectedEvent.maxLosses === 1 ? '3' : '1'}<br>
-            Max Wins: ${selectedEvent.maxWins}<br>
-            Max Losses: ${selectedEvent.maxLosses}
-        `;
+    let rewardsText = '';
+    for (let wins = 0; wins <= selectedEvent.maxWins; wins++) {
+        rewardsText += `${wins} wins: ${formatReward(selectedEvent.rewards[wins], eventSelect.value, wins)}<br>`;
     }
+    eventDetails.innerHTML = `
+        <strong>${selectedEvent.name}</strong><br>
+        Cost: ${selectedEvent.cost} ${selectedEvent.currency}<br>
+        Format: Best of ${selectedEvent.maxLosses === 1 ? '3' : '1'}<br>
+        Max Wins: ${selectedEvent.maxWins}<br>
+        Max Losses: ${selectedEvent.maxLosses}<br><br>
+        Rewards:<br>
+        ${rewardsText}
+    `;
 
     // Обновляем остальные поля
     expectedGems.textContent = '+' + Math.round(result.expectedGems);
