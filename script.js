@@ -27,7 +27,7 @@ const eventData = {
                     0: { gems: 0, packs: 1 },
                     1: { gems: 1000, packs: 1 },
                     2: { gems: 1700, packs: 4 },
-                    3: { gems: 2500, packs: 6 }
+                    3: { gems: 2500, packs: 6, pip: 2 },
                 },
                 maxWins: 3,
                 maxLosses: 1
@@ -99,7 +99,7 @@ const eventData = {
                 maxLosses: 5,
             },
             direct6wins: {
-                name: "Arena Direct (6 wins = Play Booster Box)",
+                name: "Arena Direct (6 wins = Play Booster Box(2))",
                 cost: 6000,
                 currency: "gems",
                 rewards: {
@@ -293,6 +293,7 @@ const entryCost = document.getElementById('entry-cost');
 const expectedGems = document.getElementById('expected-gems');
 const expectedPacks = document.getElementById('expected-packs');
 const packValueDisplay = document.getElementById('pack-value-display');
+const pipValueDisplay = document.getElementById('pip-value-display');
 const rareValueDisplay = document.getElementById('rare-value-display');
 const totalEv = document.getElementById('total-ev');
 
@@ -412,6 +413,7 @@ function calculateEV() {
 
     let expectedGemsReturn = 0;
     let expectedPacksReturn = 0;
+    let expectedPip = 0;
 
     for (let wins = 0; wins <= selectedEvent.maxWins; wins++) {
         const prob = probabilities[wins] || 0;
@@ -430,10 +432,15 @@ function calculateEV() {
         if (typeof reward.pip === 'number') {
             expectedGemsReturn += prob * reward.pip * pipValue;
         }
+
+        if (typeof reward.pip === 'number') {
+            expectedPip += prob * reward.pip;
+        }
     }
 
     const packValueTotal = expectedPacksReturn * packValue;
     const rareValueTotal = rareCount * rareValue;
+    const pipValueTotal = expectedPip * pipValue;
     const totalReturn = expectedGemsReturn + packValueTotal + rareValueTotal;
     const ev = totalReturn - selectedEvent.cost;
 
@@ -441,8 +448,10 @@ function calculateEV() {
         ev: ev,
         expectedGems: expectedGemsReturn,
         expectedPacks: expectedPacksReturn,
+        expectedPip: expectedPip,
         packValueTotal: packValueTotal,
         rareValueTotal: rareValueTotal,
+        pipValueTotal: pipValueTotal,
         totalReturn: totalReturn,
         probabilities: probabilities
     };
@@ -507,6 +516,7 @@ function updateDisplay() {
     expectedGems.textContent = '+' + Math.round(result.expectedGems);
     expectedPacks.textContent = result.expectedPacks.toFixed(2);
     packValueDisplay.textContent = '+' + Math.round(result.packValueTotal);
+    pipValueDisplay.textContent = '+' + Math.round(result.pipValueTotal);
     rareValueDisplay.textContent = '+' + Math.round(result.rareValueTotal);
     totalEv.textContent = (result.ev >= 0 ? '+' : '') + Math.round(result.ev);
     
