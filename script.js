@@ -311,6 +311,10 @@ const totalEv = document.getElementById('total-ev');
 const ctx = document.getElementById('ev-chart').getContext('2d');
 let chart;
 
+function gameWinrateToBo3MatchWinrate(p) {
+    return p * p * (3 - 2 * p);
+}
+
 // Calculate binomial probability
 function binomialProbability(n, k, p) {
     function factorial(num) {
@@ -323,6 +327,13 @@ function binomialProbability(n, k, p) {
     }
     
     return combination(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k);
+}
+
+function getEffectiveWinrate(selectedEvent, winRate) {
+    if (selectedEvent.maxLosses === 1 || selectedEvent.format === "Best-of-Three") {
+        return gameWinrateToBo3MatchWinrate(winRate / 100) * 100;
+    }
+    return winRate;
 }
 
 // Calculate match outcome probabilities
@@ -383,8 +394,10 @@ function calculateCombinedProbabilities(winRate) {
 }
 
 function calculateCombinedProbabilitiesBo3(winRate) {
+    const pGame = winRate / 100;
+    const pMatch = gameWinrateToBo3MatchWinrate(pGame) * 100;
     // Первый день: 4 победы из 5 (Bo3)
-    const day1Probs = calculateOutcomeProbabilities(winRate, { maxWins: 4, maxLosses: 1 });
+    const day1Probs = calculateOutcomeProbabilities(pMatch, { maxWins: 4, maxLosses: 1 });
     // Второй день: 4 победы из 7 (Draft 1)
     const draft1Probs = calculateOutcomeProbabilities(winRate, { maxWins: 4, maxLosses: 3 });
     // Третий день: 4 победы из 6 (Draft 2)
@@ -406,17 +419,19 @@ function calculateCombinedProbabilitiesBo3(winRate) {
 // Calculate expected value
 function calculateEV() {
     const selectedEvent = eventData[eventSelect.value];
-    const winRate = parseFloat(winrateSlider.value);
+    let winRate = parseFloat(winrateSlider.value);
     const packValue = parseFloat(packValueInput.value);
     const pipValue = parseFloat(pipValueInput.value) || 0;
     const rareCount = parseFloat(rareCountInput.value) || 0;
     const rareValue = parseFloat(rareValueInput.value) || 0;
 
+    winRate = getEffectiveWinrate(selectedEvent, winRate);
+
     let probabilities;
     if (eventSelect.value === 'arenaOpenAllDaysBo1') {
-        probabilities = calculateCombinedProbabilities(winRate);
+        probabilities = calculateCombinedProbabilities(parseFloat(winrateSlider.value));
     } else if (eventSelect.value === 'arenaOpenAllDaysBo3') {
-        probabilities = calculateCombinedProbabilitiesBo3(winRate);
+        probabilities = calculateCombinedProbabilitiesBo3(parseFloat(winrateSlider.value));
     } else {
         probabilities = calculateOutcomeProbabilities(winRate, selectedEvent);
     }
