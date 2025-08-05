@@ -17,7 +17,8 @@ const eventData = {
                     7: { gems: 2200, packs: 6 }
                 },
                 maxWins: 7,
-                maxLosses: 3
+                maxLosses: 3,
+                format: "Best-of-One"
             },
             traditional: {
                 name: "Traditional Draft",
@@ -30,7 +31,8 @@ const eventData = {
                     3: { gems: 2500, packs: 6, pip: 2 },
                 },
                 maxWins: 3,
-                maxLosses: 1
+                maxLosses: 1,
+                format: "Best-of-Three"
             },
             quick: {
                 name: "Quick Draft",
@@ -47,7 +49,8 @@ const eventData = {
                     7: { gems: 950, packs: 2 }
                 },
                 maxWins: 7,
-                maxLosses: 3
+                maxLosses: 3,
+                format: "Best-of-One"
             },
             sealed: {
                 name: "Sealed",
@@ -64,7 +67,8 @@ const eventData = {
                     7: { gems: 2200, packs: 6 }
                 },
                 maxWins: 7,
-                maxLosses: 3
+                maxLosses: 3,
+                format: "Best-of-One"
             },
             standardBo1: {
                 name: "Standard Event (Bo1)",
@@ -82,6 +86,7 @@ const eventData = {
                 },
                 maxWins: 7,
                 maxLosses: 3,
+                format: "Best-of-One"
             },
             standardBo3: {
                 name: "Standard Event (Bo3)",
@@ -97,6 +102,7 @@ const eventData = {
                 },
                 maxWins: 5,
                 maxLosses: 5,
+                format: "Best-of-Three"
             },
             direct6wins: {
                 name: "Arena Direct (6 wins = Play Booster Box(2))",
@@ -148,7 +154,8 @@ const eventData = {
                     7: { gems: 5000, token: true }
                 },
                 maxWins: 7,
-                maxLosses: 3
+                maxLosses: 3,
+                format: "Best-of-One"
             },
             arenaOpenDay1Bo3: {
                 name: "Arena Open Day 1 (Bo3)",
@@ -162,7 +169,8 @@ const eventData = {
                     4: { gems: 6000, token: true }
                 },
                 maxWins: 4,
-                maxLosses: 1
+                maxLosses: 1,
+                format: "Best-of-Three"
             },
             arenaOpenDay2Draft1: {
                 name: "Arena Open Day 2 Draft One",
@@ -176,7 +184,8 @@ const eventData = {
                     4: { token: true }
                 },
                 maxWins: 4,
-                maxLosses: 4
+                maxLosses: 4,
+                format: "Best-of-Three"
             },
             arenaOpenDay2Draft2: {
                 name: "Arena Open Day 2 Draft Two",
@@ -190,23 +199,24 @@ const eventData = {
                     4: { usd: 2000, gems: 400000 }
                 },
                 maxWins: 4,
-                maxLosses: 2
+                maxLosses: 2,
+                format: "Best-of-Three"
             },
             arenaOpenAllDaysBo1: {
                 name: "Arena Open (All Days, Bo1)",
-                cost: 5000, // Стоимость первого дня
+                cost: 5000,
                 currency: "gems",
                 maxWins: 15,
-                maxLosses: 3, // Можно скорректировать, если нужно учитывать поражения на каждом этапе
-                rewards: {}, // Заполним ниже
+                maxLosses: 3, 
+                rewards: {},
             },
             arenaOpenAllDaysBo3: {
                 name: "Arena Open (All Days, Bo3)",
                 cost: 5000,
                 currency: "gems",
-                maxWins: 12, // 4 (Day1 Bo3) + 4 (Draft1) + 4 (Draft2)
-                maxLosses: 1, // Для первого дня Bo3
-                rewards: {}, // Заполним ниже
+                maxWins: 12,
+                maxLosses: 1,
+                rewards: {},
             }
         };
 
