@@ -257,10 +257,13 @@ const eventData = {
             }
         };
 
-const boosterBoxValues = {
-    "Play Booster Box": 20000,
-    "Collector Booster Box": 40000
-};
+function getBoosterBoxValue(boxType) {
+    const input = document.getElementById('boosterbox-value');
+    let value = parseFloat(input.value);
+    if (isNaN(value) || value < 0) value = 0;
+    // Можно добавить отдельные поля для Collector, если нужно
+    return value;
+}
 
 for (let totalWins = 0; totalWins <= 15; totalWins++) {
     // День 1 (Bo1): 0-7 побед
@@ -538,7 +541,7 @@ function calculateEV() {
 
         if (reward.box) {
             const count = reward.boxCount || 1;
-            gems += boosterBoxValues[reward.box] * count;
+            gems += getBoosterBoxValue(reward.box) * count;
         }
         expectedGemsReturn += prob * gems;
 
@@ -552,11 +555,6 @@ function calculateEV() {
 
         if (typeof reward.pip === 'number') {
             expectedPip += prob * reward.pip;
-        }
-
-        if (reward.box) {
-            const count = reward.boxCount || 1;
-            gems += boosterBoxValues[reward.box] * count;
         }
     }
 
@@ -660,13 +658,15 @@ function updateChart(result) {
         let gems = typeof reward.gems === 'number' ? reward.gems : 0;
         if (reward.box) {
             const count = reward.boxCount || 1;
-            gems += boosterBoxValues[reward.box] * count;
+            gems += getBoosterBoxValue(reward.box) * count;
         }
         const packs = typeof reward.packs === 'number' ? reward.packs : 0;
         const rewardValue = gems + (packs * parseFloat(packValueInput.value));
         const outcomeEV = rewardValue - selectedEvent.cost;
         evData.push(outcomeEV);
         probData.push((result.probabilities[wins] || 0) * 100);
+// Booster Box Value input listener
+document.getElementById('boosterbox-value').addEventListener('input', updateDisplay);
     }
     
     if (chart) {
