@@ -634,7 +634,6 @@ function updateDisplay() {
         ${rewardsText}
     `;
 
-    // Обновляем остальные поля
     expectedGems.textContent = '+' + Math.round(result.expectedGems);
     expectedPacks.textContent = result.expectedPacks.toFixed(2);
     packValueDisplay.textContent = '+' + Math.round(result.packValueTotal);
@@ -767,10 +766,47 @@ updateDisplay();
 
 // Event listeners
 eventSelect.addEventListener('change', function() {
-    if (eventSelect.value === 'sealed') {
-        rareCountInput.value = 6;
+    // Arena Direct events (Booster Box)
+    const arenaDirectKeys = [
+        'playBoosterArenaDirect',
+        'collectorBoosterArenaDirect',
+        'ubPlayBoosterArenaDirect',
+        'ubCollectorBoosterArenaDirect'
+    ];
+    // Draft events (Rares)
+    const draftKeys = [
+        'premier',
+        'traditional',
+        'quick',
+        'sealed'
+    ];
+
+    // Booster Box Value: only for Arena Direct
+    const boosterBoxInput = document.getElementById('boosterbox-value');
+    if (arenaDirectKeys.includes(eventSelect.value)) {
+        // Default value for box: 20000
+        boosterBoxInput.value = 20000;
+        boosterBoxInput.disabled = false;
     } else {
-        rareCountInput.value = 3;
+        boosterBoxInput.value = 0;
+        boosterBoxInput.disabled = true;
+    }
+
+    // Rares: only for Drafts
+    if (draftKeys.includes(eventSelect.value)) {
+        rareValueInput.value = 25;
+        rareCountInput.disabled = false;
+        rareValueInput.disabled = false;
+        if (eventSelect.value === 'sealed') {
+            rareCountInput.value = 6;
+        } else {
+            rareCountInput.value = 3;
+        }
+    } else {
+        rareCountInput.value = 0;
+        rareValueInput.value = 0;
+        rareCountInput.disabled = true;
+        rareValueInput.disabled = true;
     }
     updateDisplay();
 });
