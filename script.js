@@ -422,41 +422,39 @@ function binomialProbability(n, k, p) {
 }
 
 function getEffectiveWinrate(selectedEvent, winRate) {
-    if (selectedEvent.maxLosses === 1 || selectedEvent.format === "Best-of-Three") {
-        return gameWinrateToBo3MatchWinrate(winRate / 100) * 100;
-    }
     return winRate;
 }
 
 // Calculate match outcome probabilities
 function calculateOutcomeProbabilities(winRate, event) {
     const p = winRate / 100;
+    if (event.name === "Standard Event (Bo3)" && event.maxWins === 5 && event.maxLosses === 5) {
+        const probabilities = {};
+        for (let k = 0; k <= 5; k++) {
+            probabilities[k] = binomialProbability(5, k, p);
+        }
+        return probabilities;
+    }
+
     const maxWins = event.maxWins;
     const maxLosses = event.maxLosses;
-
     const dp = [];
     for (let w = 0; w <= maxWins; w++) {
         dp[w] = new Array(maxLosses + 1).fill(0);
     }
     dp[0][0] = 1;
-
-    // probability for finishing with exactly W wins
     const probabilities = new Array(maxWins + 1).fill(0);
-
     for (let w = 0; w <= maxWins; w++) {
         for (let l = 0; l <= maxLosses; l++) {
             if (dp[w][l] === 0) continue;
-            
             if (w === maxWins || l === maxLosses) {
                 probabilities[w] += dp[w][l];
                 continue;
             }
-            
             dp[w + 1][l] += dp[w][l] * p;
             dp[w][l + 1] += dp[w][l] * (1 - p);
         }
     }
-
     return probabilities.reduce((acc, val, idx) => {
         acc[idx] = val;
         return acc;
