@@ -26,8 +26,8 @@ const eventData = {
                 currency: "gems",
                 rewards: {
                     0: { gems: 0, packs: 1 },
-                    1: { gems: 1000, packs: 1 },
-                    2: { gems: 1700, packs: 4 },
+                    1: { gems: 250, packs: 1 },
+                    2: { gems: 1000, packs: 4 },
                     3: { gems: 2500, packs: 6, pip: 2 },
                 },
                 maxWins: 3,
