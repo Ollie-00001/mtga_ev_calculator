@@ -531,6 +531,7 @@ function calculateEV() {
     let expectedGemsReturn = 0;
     let expectedPacksReturn = 0;
     let expectedPip = 0;
+    let expectedBoosterBoxValue = 0;
 
     for (let wins = 0; wins <= selectedEvent.maxWins; wins++) {
         const prob = probabilities[wins] || 0;
@@ -541,7 +542,9 @@ function calculateEV() {
 
         if (reward.box) {
             const count = reward.boxCount || 1;
-            gems += getBoosterBoxValue(reward.box) * count;
+            const boxValue = getBoosterBoxValue(reward.box) * count;
+            gems += boxValue;
+            expectedBoosterBoxValue += prob * boxValue;
         }
         expectedGemsReturn += prob * gems;
 
@@ -572,6 +575,7 @@ function calculateEV() {
         packValueTotal: packValueTotal,
         rareValueTotal: rareValueTotal,
         pipValueTotal: pipValueTotal,
+        expectedBoosterBoxValue: expectedBoosterBoxValue,
         totalReturn: totalReturn,
         probabilities: probabilities
     };
@@ -639,6 +643,10 @@ function updateDisplay() {
     packValueDisplay.textContent = '+' + Math.round(result.packValueTotal);
     pipValueDisplay.textContent = '+' + Math.round(result.pipValueTotal);
     rareValueDisplay.textContent = '+' + Math.round(result.rareValueTotal);
+    const boosterBoxValueDisplay = document.getElementById('boosterbox-value-display');
+    if (boosterBoxValueDisplay) {
+        boosterBoxValueDisplay.textContent = '+' + Math.round(result.expectedBoosterBoxValue);
+    }
     totalEv.textContent = (result.ev >= 0 ? '+' : '') + Math.round(result.ev);
     
     updateChart(result);
@@ -761,11 +769,7 @@ document.getElementById('boosterbox-value').addEventListener('input', updateDisp
     });
 }
 
-// Initialize
-updateDisplay();
-
-// Event listeners
-eventSelect.addEventListener('change', function() {
+function updateInputsForEvent(eventKey) {
     // Arena Direct events (Booster Box)
     const arenaDirectKeys = [
         'playBoosterArenaDirect',
@@ -783,8 +787,7 @@ eventSelect.addEventListener('change', function() {
 
     // Booster Box Value: only for Arena Direct
     const boosterBoxInput = document.getElementById('boosterbox-value');
-    if (arenaDirectKeys.includes(eventSelect.value)) {
-        // Default value for box: 20000
+    if (arenaDirectKeys.includes(eventKey)) {
         boosterBoxInput.value = 20000;
         boosterBoxInput.disabled = false;
     } else {
@@ -793,11 +796,11 @@ eventSelect.addEventListener('change', function() {
     }
 
     // Rares: only for Drafts
-    if (draftKeys.includes(eventSelect.value)) {
+    if (draftKeys.includes(eventKey)) {
         rareValueInput.value = 25;
         rareCountInput.disabled = false;
         rareValueInput.disabled = false;
-        if (eventSelect.value === 'sealed') {
+        if (eventKey === 'sealed') {
             rareCountInput.value = 6;
         } else {
             rareCountInput.value = 3;
@@ -808,6 +811,15 @@ eventSelect.addEventListener('change', function() {
         rareCountInput.disabled = true;
         rareValueInput.disabled = true;
     }
+}
+
+// Инициализация при первой загрузке
+updateInputsForEvent(eventSelect.value);
+updateDisplay();
+
+// Event listeners
+eventSelect.addEventListener('change', function() {
+    updateInputsForEvent(eventSelect.value);
     updateDisplay();
 });
 packValueInput.addEventListener('input', updateDisplay);
