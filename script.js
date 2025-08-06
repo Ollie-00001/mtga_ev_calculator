@@ -104,39 +104,76 @@ const eventData = {
                 maxLosses: 5,
                 format: "Best-of-Three"
             },
-            direct6wins: {
-                name: "Arena Direct (6 wins = Play Booster Box(2))",
+            playBoosterArenaDirect: {
+                name: "Play Booster Arena Direct",
                 cost: 6000,
                 currency: "gems",
                 rewards: {
-                    0: { gems: 0, packs: 0 },
-                    1: { gems: 0, packs: 0 },
-                    2: { gems: 0, packs: 0 },
-                    3: { gems: 3600, packs: 8 },
-                    4: { gems: 7200, packs: 16 },
-                    5: { gems: 10800, packs: 24 },
-                    6: { gems: 40000, packs: 0 },
+                    0: {},
+                    1: {},
+                    2: {},
+                    3: { gems: 2700, packs: 8 },
+                    4: { gems: 5400, packs: 16 },
+                    5: { gems: 8100, packs: 24 },
+                    6: { box: "Play Booster Box" },
+                    7: { box: "Play Booster Box", boxCount: 2 },
                 },
-                maxWins: 6,
+                maxWins: 7,
                 maxLosses: 2,
                 format: "Best-of-One"
             },
-            direct7wins: {
-                name: "Arena Direct (7 wins = Collector Box)",
+            collectorBoosterArenaDirect: {
+                name: "Collector Booster Arena Direct",
                 cost: 6000,
                 currency: "gems",
                 rewards: {
-                    0: { gems: 0, packs: 0 },
-                    1: { gems: 0, packs: 0 },
-                    2: { gems: 0, packs: 0 },
+                    0: {},
+                    1: {},
+                    2: {},
+                    3: { gems: 2700, packs: 8 },
+                    4: { gems: 5400, packs: 16 },
+                    5: { gems: 8100, packs: 24 },
+                    6: { gems: 10800, packs: 32 },
+                    7: { box: "Collector Booster Box" },
+                },
+                maxWins: 7,
+                maxLosses: 2,
+                format: "Best-of-One"
+            },
+            ubPlayBoosterArenaDirect: {
+                name: "Universes Beyond Play Booster Arena Direct",
+                cost: 8000,
+                currency: "gems",
+                rewards: {
+                    0: {},
+                    1: {},
+                    2: {},
+                    3: { gems: 3600, packs: 8 },
+                    4: { gems: 7200, packs: 16 },
+                    5: { gems: 10800, packs: 24 },
+                    6: { box: "Play Booster Box" },
+                    7: { box: "Play Booster Box", boxCount: 2 },
+                },
+                maxWins: 7,
+                maxLosses: 2,
+                format: "Best-of-One"
+            },
+            ubCollectorBoosterArenaDirect: {
+                name: "Universes Beyond Collector Booster Arena Direct",
+                cost: 8000,
+                currency: "gems",
+                rewards: {
+                    0: {},
+                    1: {},
+                    2: {},
                     3: { gems: 3600, packs: 8 },
                     4: { gems: 7200, packs: 16 },
                     5: { gems: 10800, packs: 24 },
                     6: { gems: 14400, packs: 32 },
-                    7: { gems: 80000, packs: 0 }
+                    7: { box: "Collector Booster Box" },
                 },
                 maxWins: 7,
-                maxLosses: 3,
+                maxLosses: 2,
                 format: "Best-of-One"
             },
             arenaOpenDay1Bo1: {
@@ -219,6 +256,11 @@ const eventData = {
                 rewards: {},
             }
         };
+
+const boosterBoxValues = {
+    "Play Booster Box": 20000,
+    "Collector Booster Box": 40000
+};
 
 for (let totalWins = 0; totalWins <= 15; totalWins++) {
     // День 1 (Bo1): 0-7 побед
@@ -490,12 +532,15 @@ function calculateEV() {
     for (let wins = 0; wins <= selectedEvent.maxWins; wins++) {
         const prob = probabilities[wins] || 0;
         const reward = selectedEvent.rewards[wins];
+        let gems = typeof reward.gems === 'number' ? reward.gems : 0;
 
         if (!reward) continue;
 
-        if (typeof reward.gems === 'number') {
-            expectedGemsReturn += prob * reward.gems;
+        if (reward.box) {
+            const count = reward.boxCount || 1;
+            gems += boosterBoxValues[reward.box] * count;
         }
+        expectedGemsReturn += prob * gems;
 
         if (typeof reward.packs === 'number') {
             expectedPacksReturn += prob * reward.packs;
@@ -507,6 +552,11 @@ function calculateEV() {
 
         if (typeof reward.pip === 'number') {
             expectedPip += prob * reward.pip;
+        }
+
+        if (reward.box) {
+            const count = reward.boxCount || 1;
+            gems += boosterBoxValues[reward.box] * count;
         }
     }
 
@@ -546,9 +596,14 @@ function formatReward(reward, eventKey, wins) {
     if (typeof reward.pip === 'number' && reward.pip > 0) {
         parts.push(`${reward.pip} ${reward.pip === 1 ? 'PIP' : 'PIPs'}`);
     }
+    if (reward.box) {
+        const count = reward.boxCount || 1;
+        return `${count} ${reward.box}${count > 1 ? 'es' : ''}`;
+    }
     if (reward.token) parts.push('🎟️ Token for Day 2');
     if (parts.length === 0) return 'No rewards';
     return parts.join(', ');
+
 }
 
 // Update display
@@ -602,7 +657,11 @@ function updateChart(result) {
     for (let wins = 0; wins <= selectedEvent.maxWins; wins++) {
         labels.push(`${wins} Wins`);
         const reward = selectedEvent.rewards[wins] || {};
-        const gems = typeof reward.gems === 'number' ? reward.gems : 0;
+        let gems = typeof reward.gems === 'number' ? reward.gems : 0;
+        if (reward.box) {
+            const count = reward.boxCount || 1;
+            gems += boosterBoxValues[reward.box] * count;
+        }
         const packs = typeof reward.packs === 'number' ? reward.packs : 0;
         const rewardValue = gems + (packs * parseFloat(packValueInput.value));
         const outcomeEV = rewardValue - selectedEvent.cost;
